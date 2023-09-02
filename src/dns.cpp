@@ -1,8 +1,13 @@
-#include "../include/dns.h"
+#include "../include/dns.hpp"
 
-#include <bits/stdc++.h>
+#include <netinet/in.h>
 
-#include "../include/serialization.h"
+#include <cstdint>
+#include <iostream>
+#include <string>
+#include <vector>
+
+#include "../include/serialization.hpp"
 
 std::string char2byte(char c) {
   uint16_t fi = static_cast<uint16_t>(c >> 4);

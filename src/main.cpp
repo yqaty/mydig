@@ -1,10 +1,9 @@
-#include <bits/stdc++.h>
+#include <cstdint>
+#include <map>
+#include <string>
 
 #include "../include/CLI11.hpp"
-#include "../include/dns.h"
-#include "../include/socket.h"
-#include "dns.cpp"
-#include "socket.cpp"
+#include "../include/socket.hpp"
 
 int main(int argc, char **argv) {
   printf("; <<>> MYDIG <<>>");

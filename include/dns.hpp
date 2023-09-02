@@ -1,7 +1,7 @@
 #ifndef DNS_H
 #define DNS_H
-#include <netinet/in.h>
 
+#include <iostream>
 #include <vector>
 class DnsFlags {
  public:

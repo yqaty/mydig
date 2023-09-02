@@ -1,13 +1,14 @@
-#include "../include/socket.h"
+#include "../include/socket.hpp"
 
 #include <arpa/inet.h>
-#include <bits/stdc++.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 
-#include "../include/dns.h"
-#include "../include/serialization.h"
+#include <cstdint>
+
+#include "../include/dns.hpp"
+#include "../include/serialization.hpp"
 
 const uint16_t SENDPORT = 9090;
 const uint16_t DNSPORT = 53;
