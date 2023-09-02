@@ -5,19 +5,19 @@
 #include <vector>
 class DnsFlags {
  public:
-  u_int16_t flags;
+  uint16_t flags;
 
-  DnsFlags(u_int16_t qr = 0, u_int16_t opcode = 0, u_int16_t aa = 0,
-           u_int16_t tc = 0, u_int16_t rd = 0, u_int16_t ra = 0,
-           u_int16_t z = 0, u_int16_t rcode = 0);
-  u_int16_t get_qr();
-  u_int16_t get_opcode();
-  u_int16_t get_aa();
-  u_int16_t get_tc();
-  u_int16_t get_rd();
-  u_int16_t get_ra();
-  u_int16_t get_z();
-  u_int16_t get_rcode();
+  DnsFlags(uint16_t qr = 0, uint16_t opcode = 0, uint16_t aa = 0,
+           uint16_t tc = 0, uint16_t rd = 0, uint16_t ra = 0, uint16_t z = 0,
+           uint16_t rcode = 0);
+  uint16_t get_qr();
+  uint16_t get_opcode();
+  uint16_t get_aa();
+  uint16_t get_tc();
+  uint16_t get_rd();
+  uint16_t get_ra();
+  uint16_t get_z();
+  uint16_t get_rcode();
   bool check();
   DnsFlags hton();
   DnsFlags ntoh();
@@ -26,16 +26,16 @@ class DnsFlags {
 
 class DnsHeader {
  public:
-  u_int16_t id;
+  uint16_t id;
   DnsFlags flags;
-  u_int16_t qd_count;
-  u_int16_t an_count;
-  u_int16_t ns_count;
-  u_int16_t ar_count;
+  uint16_t qd_count;
+  uint16_t an_count;
+  uint16_t ns_count;
+  uint16_t ar_count;
 
-  DnsHeader(u_int16_t id = 0, const DnsFlags &flags = DnsFlags(),
-            u_int16_t qd_count = 0, u_int16_t an_count = 0,
-            u_int16_t ns_count = 0, u_int16_t ar_count = 0);
+  DnsHeader(uint16_t id = 0, const DnsFlags &flags = DnsFlags(),
+            uint16_t qd_count = 0, uint16_t an_count = 0, uint16_t ns_count = 0,
+            uint16_t ar_count = 0);
 
   DnsHeader hton();
   DnsHeader ntoh();
@@ -46,11 +46,10 @@ class DnsHeader {
 class DnsQSF {
  public:
   std::string name;
-  u_int16_t type;
-  u_int16_t class_;
+  uint16_t type;
+  uint16_t class_;
 
-  DnsQSF(const std::string &name = "", u_int16_t type = 0,
-         u_int16_t class_ = 0);
+  DnsQSF(const std::string &name = "", uint16_t type = 0, uint16_t class_ = 0);
   DnsQSF hton();
   DnsQSF ntoh();
   DnsQSF parse(const std::string &s, int &len);
@@ -61,14 +60,14 @@ class DnsQSF {
 class DnsRRF {
  public:
   std::string name;
-  u_int16_t type;
-  u_int16_t class_;
+  uint16_t type;
+  uint16_t class_;
   uint32_t ttl;
-  u_int16_t rdlength;
+  uint16_t rdlength;
   std::string rdata;
 
-  DnsRRF(const std::string &name = "", u_int16_t type = 0, u_int16_t class_ = 0,
-         uint32_t ttl = 0, u_int16_t rdlength = 0,
+  DnsRRF(const std::string &name = "", uint16_t type = 0, uint16_t class_ = 0,
+         uint32_t ttl = 0, uint16_t rdlength = 0,
          const std::string &rdata = "");
 
   DnsRRF hton();
@@ -89,8 +88,8 @@ class DnsMessage {
   DnsMessage(const DnsHeader &header = DnsHeader());
   DnsMessage hton();
   DnsMessage ntoh();
-  void add_question(const std::string domain_name, u_int16_t type,
-                    u_int16_t class_);
+  void add_question(const std::string domain_name, uint16_t type,
+                    uint16_t class_);
   void serialize(std::ostream &os);
   void parse(const std::string &s);
   void print();

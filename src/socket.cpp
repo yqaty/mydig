@@ -9,11 +9,11 @@
 #include "../include/dns.h"
 #include "../include/serialization.h"
 
-const u_int16_t SENDPORT = 9090;
-const u_int16_t DNSPORT = 53;
+const uint16_t SENDPORT = 9090;
+const uint16_t DNSPORT = 53;
 const int UDPMAXSIZE = 512;
 
-MyAddr::MyAddr(sa_family_t sin_family, u_int16_t sin_port, uint32_t sin_addr) {
+MyAddr::MyAddr(sa_family_t sin_family, uint16_t sin_port, uint32_t sin_addr) {
   this->sin_family = sin_family;
   this->sin_port = sin_port;
   this->sin_addr = sin_addr;
@@ -51,7 +51,7 @@ void send(int sockfd, std::string domain_name, MyAddr &server_addr) {
   // Generate a random transaction ID in the range [0, 65535]
   std::uniform_int_distribution<uint16_t> dist(0, 65535);
   std::ostringstream os;
-  u_int16_t transaction_id = dist(gen);
+  uint16_t transaction_id = dist(gen);
   DnsMessage message = DnsMessage(
       DnsHeader(transaction_id, DnsFlags(0, 0, 0, 0, 1, 0, 0, 0), 0, 0, 0, 0));
   message.add_question(domain_name, 1, 1);

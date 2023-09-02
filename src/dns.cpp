@@ -31,7 +31,7 @@ std::string dns2n(const std::string &s) {
 
 std::string n2dns(const std::string &s, int &pos) {
   if ((s[pos] & 192) == 192) {
-    u_int16_t _pos;
+    uint16_t _pos;
     my_deserialize(s, pos, _pos);
     _pos = ntohs(_pos) - 192 * 256;
     int __pos = static_cast<int>(_pos);
@@ -51,37 +51,37 @@ std::string n2dns(const std::string &s, int &pos) {
 
 // DnsFlags's functions
 
-DnsFlags::DnsFlags(u_int16_t qr, u_int16_t opcode, u_int16_t aa, u_int16_t tc,
-                   u_int16_t rd, u_int16_t ra, u_int16_t z, u_int16_t rcode) {
+DnsFlags::DnsFlags(uint16_t qr, uint16_t opcode, uint16_t aa, uint16_t tc,
+                   uint16_t rd, uint16_t ra, uint16_t z, uint16_t rcode) {
   flags = (qr << 15) | (opcode << 11) | (aa << 10) | (tc << 9) | (rd << 8) |
           (ra << 7) | (z << 4) | (rcode << 0);
 }
 
-u_int16_t DnsFlags::get_qr() { return flags >> 15 & 1; }
+uint16_t DnsFlags::get_qr() { return flags >> 15 & 1; }
 
-u_int16_t DnsFlags::get_opcode() { return flags >> 11 & 15; }
+uint16_t DnsFlags::get_opcode() { return flags >> 11 & 15; }
 
-u_int16_t DnsFlags::get_aa() { return flags >> 10 & 1; }
+uint16_t DnsFlags::get_aa() { return flags >> 10 & 1; }
 
-u_int16_t DnsFlags::get_tc() { return flags >> 9 & 1; }
+uint16_t DnsFlags::get_tc() { return flags >> 9 & 1; }
 
-u_int16_t DnsFlags::get_rd() { return flags >> 8 & 1; }
+uint16_t DnsFlags::get_rd() { return flags >> 8 & 1; }
 
-u_int16_t DnsFlags::get_ra() { return flags >> 7 & 1; }
+uint16_t DnsFlags::get_ra() { return flags >> 7 & 1; }
 
-u_int16_t DnsFlags::get_z() { return flags >> 4 & 7; }
+uint16_t DnsFlags::get_z() { return flags >> 4 & 7; }
 
-u_int16_t DnsFlags::get_rcode() { return flags >> 0 & 15; }
+uint16_t DnsFlags::get_rcode() { return flags >> 0 & 15; }
 
 bool DnsFlags::check() {
-  u_int16_t qr = get_qr();
-  u_int16_t opcode = get_opcode();
-  u_int16_t aa = get_aa();
-  u_int16_t tc = get_tc();
-  u_int16_t rd = get_rd();
-  u_int16_t ra = get_ra();
-  u_int16_t z = get_z();
-  u_int16_t rcode = get_rcode();
+  uint16_t qr = get_qr();
+  uint16_t opcode = get_opcode();
+  uint16_t aa = get_aa();
+  uint16_t tc = get_tc();
+  uint16_t rd = get_rd();
+  uint16_t ra = get_ra();
+  uint16_t z = get_z();
+  uint16_t rcode = get_rcode();
   if (qr == 0) {
     if (opcode > 2 || aa == 1 || tc == 1 || ra == 1 || z || rcode) {
       return 0;
@@ -110,9 +110,8 @@ void DnsFlags::serialize(std::ostream &os) {
 
 // DnsHeader's functions
 
-DnsHeader::DnsHeader(u_int16_t id, const DnsFlags &flags, u_int16_t qd_count,
-                     u_int16_t an_count, u_int16_t ns_count,
-                     u_int16_t ar_count) {
+DnsHeader::DnsHeader(uint16_t id, const DnsFlags &flags, uint16_t qd_count,
+                     uint16_t an_count, uint16_t ns_count, uint16_t ar_count) {
   this->id = id;
   this->flags = flags;
   this->qd_count = qd_count;
@@ -144,7 +143,7 @@ void DnsHeader::print() {
 
 // DnsQSF's functions
 
-DnsQSF::DnsQSF(const std::string &name, u_int16_t type, u_int16_t class_) {
+DnsQSF::DnsQSF(const std::string &name, uint16_t type, uint16_t class_) {
   this->name = name;
   this->type = type;
   this->class_ = class_;
@@ -160,7 +159,7 @@ DnsQSF DnsQSF::ntoh() {
 
 DnsQSF DnsQSF::parse(const std::string &s, int &pos) {
   std::string name = n2dns(s, pos);
-  u_int16_t type;
+  uint16_t type;
   uint16_t class_;
   my_deserialize(s, pos, type);
   my_deserialize(s, pos, class_);
@@ -178,8 +177,8 @@ void DnsQSF::print() { printf("%s\t\tIN\t A", this->name.c_str()); }
 
 // DnsRRF's functions
 
-DnsRRF::DnsRRF(const std::string &name, u_int16_t type, u_int16_t class_,
-               uint32_t ttl, u_int16_t rdlength, const std::string &rdata) {
+DnsRRF::DnsRRF(const std::string &name, uint16_t type, uint16_t class_,
+               uint32_t ttl, uint16_t rdlength, const std::string &rdata) {
   this->name = name;
   this->type = type;
   this->class_ = class_;
@@ -200,10 +199,10 @@ DnsRRF DnsRRF::ntoh() {
 
 DnsRRF DnsRRF::parse(const std::string &s, int &pos) {
   std::string name = n2dns(s, pos);
-  u_int16_t type;
-  u_int16_t class_;
+  uint16_t type;
+  uint16_t class_;
   u_int32_t ttl;
-  u_int16_t rdlength;
+  uint16_t rdlength;
   my_deserialize(s, pos, type);
   my_deserialize(s, pos, class_);
   my_deserialize(s, pos, ttl);
@@ -296,8 +295,8 @@ DnsMessage DnsMessage::ntoh() {
   return message;
 }
 
-void DnsMessage::add_question(const std::string domain_name, u_int16_t type,
-                              u_int16_t class_) {
+void DnsMessage::add_question(const std::string domain_name, uint16_t type,
+                              uint16_t class_) {
   this->header.qd_count++;
   this->question.push_back(DnsQSF(domain_name, type, class_));
 }
