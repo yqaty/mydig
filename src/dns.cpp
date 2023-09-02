@@ -4,6 +4,8 @@
 
 #include <cstdint>
 #include <iostream>
+#include <random>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -30,7 +32,7 @@ template <typename T>
 void my_deserialize(const std::string &s, int &pos, T &u) {
   std::istringstream is(s.substr(pos, sizeof(T)));
   pos += sizeof(T);
-  deserialize(is, u);
+  Deserialize(is, u);
 }
 
 std::string dns2n(const std::string &s) {
@@ -129,9 +131,7 @@ DnsFlags DnsFlags::ntoh() {
   return dns_flags;
 }
 
-void DnsFlags::serialize(std::ostream &os) {
-  serialize_for_copyable(os, *this);
-}
+void DnsFlags::serialize(std::ostream &os) { Serialize(os, *this); }
 
 // DnsHeader's functions
 
@@ -158,7 +158,12 @@ DnsHeader DnsHeader::ntoh() {
 }
 
 void DnsHeader::serialize(std::ostream &os) {
-  serialize_for_copyable(os, *this);
+  Serialize(os, id);
+  flags.serialize(os);
+  Serialize(os, qd_count);
+  Serialize(os, an_count);
+  Serialize(os, ns_count);
+  Serialize(os, ar_count);
 }
 
 void DnsHeader::print() {
@@ -193,9 +198,9 @@ DnsQSF DnsQSF::parse(const std::string &s, int &pos) {
 }
 
 void DnsQSF::serialize(std::ostream &os) {
-  serialize_for_STL(os, this->name);
-  serialize_for_copyable(os, this->type);
-  serialize_for_copyable(os, this->class_);
+  Serialize(os, this->name);
+  Serialize(os, this->type);
+  Serialize(os, this->class_);
 }
 
 void DnsQSF::print() {
@@ -245,39 +250,53 @@ DnsRRF DnsRRF::parse(const std::string &s, int &pos) {
     rdata.resize(rdlength);
     std::istringstream is(s.substr(pos, rdlength));
     pos += rdlength;
-    deserialize(is, rdata);
+    Deserialize(is, rdata);
   }
   return DnsRRF(name, type, class_, ttl, rdlength, rdata);
 }
 
 void DnsRRF::serialize(std::ostream &os) {
-  serialize_for_STL(os, this->name);
-  serialize_for_copyable(os, this->type);
-  serialize_for_copyable(os, this->class_);
-  serialize_for_copyable(os, this->rdlength);
-  serialize_for_STL(os, this->rdata);
+  Serialize(os, this->name);
+  Serialize(os, this->type);
+  Serialize(os, this->class_);
+  Serialize(os, this->rdlength);
+  Serialize(os, this->rdata);
 }
 
 void DnsRRF::print() {
-  if (type == 1) {
-    printf("%s\t%u\tIN\tA\t%u.%u.%u.%u\n", name.c_str(), ttl,
-           static_cast<uint8_t>(rdata[0]), static_cast<uint8_t>(rdata[1]),
-           static_cast<uint8_t>(rdata[2]), static_cast<uint8_t>(rdata[3]));
-  } else if (type == 2) {
-    printf("%s\t%u\tIN\tNS\t%s\n", name.c_str(), ttl, rdata.c_str());
-  } else if (type == 5) {
-    printf("%s\t%u\tIN\tCNAME\t%s\n", name.c_str(), ttl, rdata.c_str());
-  } else if (type == 15) {
-    printf("%s\t%u\tIN\tMX\t%s\n", name.c_str(), ttl, rdata.c_str());
-  } else if (type == 28) {
-    std::string s;
-    for (int i = 0; i < rdata.size(); ++i) {
-      s += char2byte(rdata[i]);
-      if ((i & 1) && i + 1 < rdata.size()) {
-        s += ':';
+  switch (type) {
+    case 1:
+      printf("%s\t%u\tIN\tA\t%u.%u.%u.%u\n", name.c_str(), ttl,
+             static_cast<uint8_t>(rdata[0]), static_cast<uint8_t>(rdata[1]),
+             static_cast<uint8_t>(rdata[2]), static_cast<uint8_t>(rdata[3]));
+      break;
+
+    case 2:
+      printf("%s\t%u\tIN\tNS\t%s\n", name.c_str(), ttl, rdata.c_str());
+      break;
+
+    case 5:
+      printf("%s\t%u\tIN\tCNAME\t%s\n", name.c_str(), ttl, rdata.c_str());
+      break;
+
+    case 15:
+      printf("%s\t%u\tIN\tMX\t%s\n", name.c_str(), ttl, rdata.c_str());
+      break;
+
+    case 28: {
+      std::string s;
+      for (int i = 0; i < rdata.size(); ++i) {
+        s += char2byte(rdata[i]);
+        if ((i & 1) && i + 1 < rdata.size()) {
+          s += ':';
+        }
       }
+      printf("%s\t%u\tIN\tAAAA\t%s\n", name.c_str(), ttl, s.c_str());
+      break;
     }
-    printf("%s\t%u\tIN\tAAAA\t%s\n", name.c_str(), ttl, s.c_str());
+
+    default:
+      break;
   }
 }
 
@@ -360,7 +379,7 @@ void DnsMessage::serialize(std::ostream &os) {
 void DnsMessage::parse(const std::string &s) {
   DnsHeader header;
   std::istringstream is(s.substr(0, 12));
-  deserialize(is, header);
+  Deserialize(is, header);
   header = header.ntoh();
   DnsMessage message(header);
   int pos = 12;

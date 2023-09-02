@@ -4,8 +4,11 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include <cstdint>
+#include <cstring>
+#include <sstream>
 
 #include "../include/dns.hpp"
 #include "../include/serialization.hpp"
@@ -151,56 +154,3 @@ void query_trace(std::string &domain_name, std::string &server,
   }
   close(sockfd);
 }
-
-/*
-90
-e5 9f 81 80 00 01 00 03 00 00 00 00 03 77 77 77
-05 62 61 69 64 75 03 63 6f 6d 00 00 01 00 01 c0
-0c 00 05 00 01 00 00 03 ad 00 0f 03 77 77 77 01
-61 06 73 68 69 66 65 6e c0 16 c0 2b 00 01 00 01
-00 00 03 ad 00 04 b6 3d c8 07 c0 2b 00 01 00 01
-00 00 03 ad 00 04 b6 3d c8 06
-
-Frame 2: 134 bytes on wire (1072 bits), 134 bytes captured (1072 bits) on
-interface any, id 0 Linux cooked capture v1 Internet Protocol Version 4, Src:
-127.0.0.53, Dst: 127.0.0.1 User Datagram Protocol, Src Port: 53, Dst Port: 9090
-Domain Name System (response)
-    Transaction ID: 0xe59f
-    Flags: 0x8180 Standard query response, No error
-    Questions: 1
-    Answer RRs: 3
-    Authority RRs: 0
-    Additional RRs: 0
-    Queries
-        www.baidu.com: type A, class IN
-            Name: www.baidu.com
-            [Name Length: 13]
-            [Label Count: 3]
-            Type: A (Host Address) (1)
-            Class: IN (0x0001)
-    Answers
-        www.baidu.com: type CNAME, class IN, cname www.a.shifen.com
-            Name: www.baidu.com
-            Type: CNAME (Canonical NAME for an alias) (5)
-            Class: IN (0x0001)
-            Time to live: 941 (15 minutes, 41 seconds)
-            Data length: 15
-            CNAME: www.a.shifen.com
-        www.a.shifen.com: type A, class IN, addr 182.61.200.7
-            Name: www.a.shifen.com
-            Type: A (Host Address) (1)
-            Class: IN (0x0001)
-            Time to live: 941 (15 minutes, 41 seconds)
-            Data length: 4
-            Address: 182.61.200.7
-        www.a.shifen.com: type A, class IN, addr 182.61.200.6
-            Name: www.a.shifen.com
-            Type: A (Host Address) (1)
-            Class: IN (0x0001)
-            Time to live: 941 (15 minutes, 41 seconds)
-            Data length: 4
-            Address: 182.61.200.6
-    [Request In: 1]
-    [Time: 0.000228741 seconds]
-
-*/
