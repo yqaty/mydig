@@ -67,7 +67,6 @@ void receive(int sockfd, MyAddr &server_addr) {
   MyAddr addr_from;
   char buffer[2 * UDPMAXSIZE];
   socklen_t fromlen = sizeof(struct sockaddr);
-  std::cout << "!!" << std::endl;
   int len = recvfrom(sockfd, buffer, UDPMAXSIZE * 2, 0,
                      reinterpret_cast<sockaddr *>(&addr_from), &fromlen);
   std::string sis;
