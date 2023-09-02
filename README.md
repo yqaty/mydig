@@ -1,8 +1,8 @@
 # mydig
 
-## USAGE
+It's a very simple DNS query command like ```dig``` that uses [CLI11](https://github.com/CLIUtils/CLI11) library.
 
-A very simple DNS query command like ```dig```.
+## USAGE
 
 ```
 Usage: mydig [OPTIONS]
