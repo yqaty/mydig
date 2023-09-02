@@ -23,7 +23,8 @@ $ cmake ..
 $ sudo make && make install
 ```
 
-```make install``` will copy binary file "mydig" to ```/usr/local/bin```
+``` make install ``` will copy binary file "mydig" to ``` /usr/local/bin ```.
+
 ---
 
 ## Projects Logs
