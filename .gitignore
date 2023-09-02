@@ -1,6 +1,7 @@
 node_modules
 build/
 cmd/
+.vscode/
 
 src/err
 src/mydig
