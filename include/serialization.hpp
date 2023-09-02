@@ -31,8 +31,6 @@ void Serialize(std::ostream &os, const T &val)
 {
   unsigned int size = val.size();
 
-  os.write((const char *)&size, sizeof(size));
-
   os.write((const char *)val.data(), size * sizeof(typename T::value_type));
 }
 
@@ -53,8 +51,6 @@ void Serialize(std::ostream &os, const T &val)
 
 {
   unsigned int size = val.size();
-
-  os.write((const char *)&size, sizeof(size));
 
   for (auto &v : val) {
     Serialize(os, v);
@@ -89,11 +85,7 @@ template <class T, typename std::enable_if_t<
 void Deserialize(std::istream &is, T &val)
 
 {
-  unsigned int size = 0;
-
-  is.read((char *)&size, sizeof(unsigned int));
-
-  val.resize(size);
+  unsigned int size = val.size();
 
   is.read((char *)val.data(), size * sizeof(typename T::value_type));
 }

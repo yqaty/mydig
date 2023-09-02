@@ -416,11 +416,7 @@ std::string DnsMessage::get_next_ip() {
 
 void DnsMessage::print() {
   printf(";; global options: +cmd\n");
-  if (answer.size()) {
-    printf(";; Got answer\n");
-  } else {
-    printf(";; No answer\n");
-  }
+  printf(";; Got answer\n");
   printf(";; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: %u\n", header.id);
   printf(";; flags: ");
   if (header.flags.get_qr() == 1) {
