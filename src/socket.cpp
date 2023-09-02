@@ -20,6 +20,13 @@ MyAddr::MyAddr(sa_family_t sin_family, uint16_t sin_port, uint32_t sin_addr) {
   memset(this->sin_zero, 0, sizeof(this->sin_zero));
 }
 
+uint32_t A2addr_in(const std::string &s) {
+  return (static_cast<uint32_t>(static_cast<uint8_t>(s[0]))) |
+         (static_cast<uint32_t>(static_cast<uint8_t>(s[1])) << 8) |
+         (static_cast<uint32_t>(static_cast<uint8_t>(s[2])) << 16) |
+         (static_cast<uint32_t>(static_cast<uint8_t>(s[3])) << 24);
+}
+
 void scan(char *buffer) {
   int size;
   std::cin >> size;
@@ -44,14 +51,9 @@ void scan(char *buffer) {
   buffer[size] = 0;
 }
 
-void send(int sockfd, std::string domain_name, MyAddr &server_addr,
-          uint16_t query_type) {
-  std::ostringstream os;
-  uint16_t transaction_id = get_transaction_id();
-  DnsMessage message = DnsMessage(
-      DnsHeader(transaction_id, DnsFlags(0, 0, 0, 0, 1, 0, 0, 0), 0, 0, 0, 0));
-  message.add_question(domain_name, query_type, 1);
+void send(int sockfd, MyAddr &server_addr, DnsMessage message) {
   message = message.hton();
+  std::ostringstream os;
   message.serialize(os);
   std::string sos = os.str();
   sendto(sockfd, reinterpret_cast<void *>(const_cast<char *>(sos.c_str())),
@@ -59,12 +61,15 @@ void send(int sockfd, std::string domain_name, MyAddr &server_addr,
          sizeof(struct sockaddr));
 }
 
-void receive(int sockfd, MyAddr &server_addr) {
+DnsMessage receive(int sockfd, MyAddr &server_addr) {
   MyAddr addr_from;
   char buffer[UDPMAXSIZE + 1];
   socklen_t fromlen = sizeof(struct sockaddr);
-  int len = recvfrom(sockfd, buffer, UDPMAXSIZE, 0,
-                     reinterpret_cast<sockaddr *>(&addr_from), &fromlen);
+  int len;
+  do {
+    len = recvfrom(sockfd, buffer, UDPMAXSIZE, 0,
+                   reinterpret_cast<sockaddr *>(&addr_from), &fromlen);
+  } while (addr_from.sin_addr != server_addr.sin_addr);
   std::string sis;
   sis.resize(len);
   for (int i = 0; i < len; ++i) {
@@ -72,7 +77,7 @@ void receive(int sockfd, MyAddr &server_addr) {
   }
   DnsMessage message;
   message.parse(sis);
-  message.print();
+  return message;
 }
 
 void receive2(int sockfd, MyAddr &server_addr) {
@@ -97,9 +102,52 @@ void query(std::string domain_name, std::string server, uint16_t query_type) {
   MyAddr my_addr(AF_INET, htons(SENDPORT), htonl(INADDR_ANY));
   bind(sockfd, reinterpret_cast<sockaddr *>(&my_addr), sizeof(struct sockaddr));
   MyAddr server_addr(AF_INET, htons(DNSPORT), inet_addr(server.c_str()));
-  send(sockfd, domain_name, server_addr, query_type);
-  receive(sockfd, server_addr);
-  // receive2(sockfd, server_addr);
+  DnsMessage message;
+  message.gen(domain_name, query_type, 1);
+  send(sockfd, server_addr, message);
+  message = receive(sockfd, server_addr);
+  message.print();
+  close(sockfd);
+}
+
+void query_trace(std::string &domain_name, std::string &server,
+                 uint16_t query_type) {
+  int sockfd;
+  sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+  if (sockfd == -1) {
+    std::cerr << "socket() error" << std::endl;
+    return;
+  }
+
+  MyAddr my_addr(AF_INET, htons(SENDPORT), htonl(INADDR_ANY));
+  bind(sockfd, reinterpret_cast<sockaddr *>(&my_addr), sizeof(struct sockaddr));
+  MyAddr server_addr(AF_INET, htons(DNSPORT), inet_addr(server.c_str()));
+  DnsMessage message;
+  message.gen(std::string(1, static_cast<char>(0)), 2, 1);
+  send(sockfd, server_addr, message);
+  DnsMessage recvmsg(receive(sockfd, server_addr));
+  recvmsg.print();
+  recvmsg.answer[0].rdata.erase(recvmsg.answer[0].rdata.size() - 1);
+  message.gen(recvmsg.answer[0].rdata, 1, 1);
+  send(sockfd, server_addr, message);
+  recvmsg = receive(sockfd, server_addr);
+  recvmsg.print();
+  server = recvmsg.answer[0].rdata;
+  while (1) {
+    MyAddr server_addr(AF_INET, htons(DNSPORT), A2addr_in(server));
+    DnsMessage message;
+    message.gen(domain_name, query_type, 1);
+    send(sockfd, server_addr, message);
+    DnsMessage recvmsg(receive(sockfd, server_addr));
+    recvmsg.print();
+    if (recvmsg.answer.size()) {
+      break;
+    }
+    server = recvmsg.get_next_ip();
+    if (server.size() != 4) {
+      break;
+    }
+  }
   close(sockfd);
 }
 

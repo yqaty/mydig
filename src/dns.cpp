@@ -29,6 +29,9 @@ void my_deserialize(const std::string &s, int &pos, T &u) {
 }
 
 std::string dns2n(const std::string &s) {
+  if (!s[0]) {
+    return s;
+  }
   std::string t;
   int last = -1;
   for (int i = 0; i < s.length(); ++i) {
@@ -356,28 +359,35 @@ void DnsMessage::parse(const std::string &s) {
   header = header.ntoh();
   DnsMessage message(header);
   int pos = 12;
-  ////std::cout << pos << std::endl;
-  for (int i = 12; i < 30; ++i) {
-    ////std::cout << (int)s[i] << " ";
-  }
-  ////std::cout << '\n';
   for (auto &u : message.question) {
     u = u.parse(s, pos);
   }
-  ////std::cout << "answer" << pos << std::endl;
   for (auto &u : message.answer) {
-    ////std::cout << "+1:" << pos << std::endl;
     u = u.parse(s, pos);
   }
-  ////std::cout << "authority" << pos << std::endl;
   for (auto &u : message.authority) {
     u = u.parse(s, pos);
   }
-  ////std::cout << "additional" << pos << std::endl;
   for (auto &u : message.additional) {
     u = u.parse(s, pos);
   }
   *this = message;
+}
+
+void DnsMessage::gen(const std::string &domain_name, uint16_t query_type,
+                     uint16_t RD) {
+  uint16_t transaction_id = get_transaction_id();
+  DnsMessage message(
+      DnsHeader(transaction_id, DnsFlags(0, 0, 0, 0, RD, 0, 0, 0), 0, 0, 0, 0));
+  message.add_question(domain_name, query_type, 1);
+  *this = message;
+}
+
+std::string DnsMessage::get_next_ip() {
+  for (auto &u : additional) {
+    if (u.type == 1) return u.rdata;
+  }
+  return std::string();
 }
 
 void DnsMessage::print() {

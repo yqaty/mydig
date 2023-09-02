@@ -22,17 +22,22 @@ int main(int argc, char **argv) {
   CLI::App app{"mydig"};
 
   std::string domain_name;
-  app.add_option("-d", domain_name, "query domain name")->required();
+  app.add_option("-d,--domain", domain_name, "query domain name")->required();
 
   std::string server_name("127.0.0.53");
-  app.add_option("-s", server_name, "specify domain name server");
+  app.add_option("-s,--server", server_name, "specify domain name server");
 
   std::string type("A");
-  app.add_option("-t", type, "specify record type");
+  app.add_option("-t,--type", type, "specify record type");
+
+  bool trace{false};
+  app.add_flag("--trace", trace, "Trace delegation down from root");
 
   CLI11_PARSE(app, argc, argv);
-
-  query(domain_name, server_name, dns_type[type]);
-
+  if (!trace) {
+    query(domain_name, server_name, dns_type[type]);
+  } else {
+    query_trace(domain_name, server_name, dns_type[type]);
+  }
   return 0;
 }

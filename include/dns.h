@@ -92,6 +92,8 @@ class DnsMessage {
                     uint16_t class_);
   void serialize(std::ostream &os);
   void parse(const std::string &s);
+  void gen(const std::string &domain_name, uint16_t query_type, uint16_t RD);
+  std::string get_next_ip();
   void print();
 };
 #endif
