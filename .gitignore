@@ -2,5 +2,7 @@ node_modules
 build/
 cmd/
 
+src/err
+src/mydig
 package-lock.json
 package.json
