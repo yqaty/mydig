@@ -1,5 +1,31 @@
 # mydig
 
+## USAGE
+
+A very simple DNS query command like ```dig```.
+
+```
+Usage: mydig [OPTIONS]
+
+Options:
+  -h,--help                   Print this help message and exit
+  -d,--domain TEXT REQUIRED   query domain name
+  -s,--server TEXT            specify domain name server
+  -t,--type TEXT              specify record type
+  --trace                     Trace delegation down from root
+```
+## BUILD
+
+```shell
+$ mkdir build
+$ cd build
+$ cmake ..
+$ sudo make && make install
+```
+
+```make install``` will copy binary file "mydig" to ```/usr/local/bin```
+---
+
 ## Projects Logs
 
 ### Day1 Day2
