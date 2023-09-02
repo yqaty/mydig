@@ -44,17 +44,13 @@ void scan(char *buffer) {
   buffer[size] = 0;
 }
 
-void send(int sockfd, std::string domain_name, MyAddr &server_addr) {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-
-  // Generate a random transaction ID in the range [0, 65535]
-  std::uniform_int_distribution<uint16_t> dist(0, 65535);
+void send(int sockfd, std::string domain_name, MyAddr &server_addr,
+          uint16_t query_type) {
   std::ostringstream os;
-  uint16_t transaction_id = dist(gen);
+  uint16_t transaction_id = get_transaction_id();
   DnsMessage message = DnsMessage(
       DnsHeader(transaction_id, DnsFlags(0, 0, 0, 0, 1, 0, 0, 0), 0, 0, 0, 0));
-  message.add_question(domain_name, 1, 1);
+  message.add_question(domain_name, query_type, 1);
   message = message.hton();
   message.serialize(os);
   std::string sos = os.str();
@@ -91,7 +87,7 @@ void receive2(int sockfd, MyAddr &server_addr) {
   message.print();
 }
 
-void query(std::string domain_name, std::string server) {
+void query(std::string domain_name, std::string server, uint16_t query_type) {
   int sockfd;
   sockfd = socket(AF_INET, SOCK_DGRAM, 0);
   if (sockfd == -1) {
@@ -101,7 +97,7 @@ void query(std::string domain_name, std::string server) {
   MyAddr my_addr(AF_INET, htons(SENDPORT), htonl(INADDR_ANY));
   bind(sockfd, reinterpret_cast<sockaddr *>(&my_addr), sizeof(struct sockaddr));
   MyAddr server_addr(AF_INET, htons(DNSPORT), inet_addr(server.c_str()));
-  send(sockfd, domain_name, server_addr);
+  send(sockfd, domain_name, server_addr, query_type);
   receive(sockfd, server_addr);
   // receive2(sockfd, server_addr);
   close(sockfd);

@@ -4,6 +4,14 @@
 
 #include "../include/serialization.h"
 
+uint16_t get_transaction_id() {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+
+  std::uniform_int_distribution<uint16_t> dist(0, 65535);
+  return dist(gen);
+}
+
 template <typename T>
 void my_deserialize(const std::string &s, int &pos, T &u) {
   std::istringstream is(s.substr(pos, sizeof(T)));
@@ -173,7 +181,9 @@ void DnsQSF::serialize(std::ostream &os) {
   serialize_for_copyable(os, this->class_);
 }
 
-void DnsQSF::print() { printf("%s\t\tIN\t A", this->name.c_str()); }
+void DnsQSF::print() {
+  printf("%s\t\tIN\t %s\n", this->name.c_str(), this->type == 1 ? "A" : "NS");
+}
 
 // DnsRRF's functions
 
@@ -212,7 +222,7 @@ DnsRRF DnsRRF::parse(const std::string &s, int &pos) {
   ttl = ntohl(ttl);
   rdlength = ntohs(rdlength);
   std::string rdata;
-  if (type == 5) {
+  if (type == 5 || type == 2) {
     rdata = n2dns(s, pos);
   } else {
     rdata.resize(rdlength);
@@ -236,6 +246,8 @@ void DnsRRF::print() {
     printf("%s\t%u\tIN\tA\t%u.%u.%u.%u\n", name.c_str(), ttl,
            static_cast<uint8_t>(rdata[0]), static_cast<uint8_t>(rdata[1]),
            static_cast<uint8_t>(rdata[2]), static_cast<uint8_t>(rdata[3]));
+  } else if (type == 2) {
+    printf("%s\t%u\tIN\tNS\t%s\n", name.c_str(), ttl, rdata.c_str());
   } else if (type == 5) {
     printf("%s\t%u\tIN\tCNAME\t%s\n", name.c_str(), ttl, rdata.c_str());
   }
@@ -349,7 +361,6 @@ void DnsMessage::parse(const std::string &s) {
 }
 
 void DnsMessage::print() {
-  printf("; <<>> MYDIG <<>> %s\n", question[0].name.c_str());
   printf(";; global options: +cmd\n");
   if (answer.size()) {
     printf(";; Got answer\n");
