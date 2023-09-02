@@ -61,9 +61,9 @@ void send(int sockfd, std::string domain_name, MyAddr &server_addr,
 
 void receive(int sockfd, MyAddr &server_addr) {
   MyAddr addr_from;
-  char buffer[2 * UDPMAXSIZE];
+  char buffer[UDPMAXSIZE + 1];
   socklen_t fromlen = sizeof(struct sockaddr);
-  int len = recvfrom(sockfd, buffer, UDPMAXSIZE * 2, 0,
+  int len = recvfrom(sockfd, buffer, UDPMAXSIZE, 0,
                      reinterpret_cast<sockaddr *>(&addr_from), &fromlen);
   std::string sis;
   sis.resize(len);

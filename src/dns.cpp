@@ -4,6 +4,15 @@
 
 #include "../include/serialization.h"
 
+std::string char2byte(char c) {
+  uint16_t fi = static_cast<uint16_t>(c >> 4);
+  uint16_t se = static_cast<uint16_t>(c & 15);
+  std::string s;
+  s += fi < 10 ? static_cast<char>(fi + '0') : static_cast<char>(fi - 10 + 'a');
+  s += se < 10 ? static_cast<char>(se + '0') : static_cast<char>(se - 10 + 'a');
+  return s;
+}
+
 uint16_t get_transaction_id() {
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -250,6 +259,17 @@ void DnsRRF::print() {
     printf("%s\t%u\tIN\tNS\t%s\n", name.c_str(), ttl, rdata.c_str());
   } else if (type == 5) {
     printf("%s\t%u\tIN\tCNAME\t%s\n", name.c_str(), ttl, rdata.c_str());
+  } else if (type == 15) {
+    printf("%s\t%u\tIN\tMX\t%s\n", name.c_str(), ttl, rdata.c_str());
+  } else if (type == 28) {
+    std::string s;
+    for (int i = 0; i < rdata.size(); ++i) {
+      s += char2byte(rdata[i]);
+      if ((i & 1) && i + 1 < rdata.size()) {
+        s += ':';
+      }
+    }
+    printf("%s\t%u\tIN\tAAAA\t%s\n", name.c_str(), ttl, s.c_str());
   }
 }
 
@@ -367,7 +387,7 @@ void DnsMessage::print() {
   } else {
     printf(";; No answer\n");
   }
-  printf(";; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: u\n", header.id);
+  printf(";; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: %u\n", header.id);
   printf(";; flags: ");
   if (header.flags.get_qr() == 1) {
     printf("qr ");
