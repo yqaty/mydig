@@ -91,8 +91,7 @@ void receive2(int sockfd, MyAddr &server_addr) {
   message.print();
 }
 
-void query(std::string domain_name,
-           std::string server = std::string("127.0.0.53")) {
+void query(std::string domain_name, std::string server) {
   int sockfd;
   sockfd = socket(AF_INET, SOCK_DGRAM, 0);
   if (sockfd == -1) {
