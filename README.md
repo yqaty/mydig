@@ -1,6 +1,6 @@
 # mydig
 
-It's a very simple DNS query command like ```dig``` that uses [CLI11](https://github.com/CLIUtils/CLI11) library.
+It's a very simple DNS query command like ```dig``` using [CLI11](https://github.com/CLIUtils/CLI11) library.
 
 ## USAGE
 
