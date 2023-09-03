@@ -1,6 +1,6 @@
 # mydig
 
-It's a very simple DNS query command like ```dig``` using [CLI11](https://github.com/CLIUtils/CLI11) library.
+It's a very simple DNS query command like ```dig``` using [CLI11](https://github.com/CLIUtils/CLI11) library. And it binds port 9090.
 
 ## USAGE
 
@@ -74,6 +74,9 @@ vscode 甚至今天才装了 C++ 插件。。。。
 
 basic 部分基本完成了。
 
+### Day7
+
+写了个极简的 CMakeLists.txt 用来构建和安装项目。
 
 ### DNS 报文注意事项
 
