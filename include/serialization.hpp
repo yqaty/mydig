@@ -1,8 +1,6 @@
 #ifndef SERIALIZATION_H
 #define SERIALIZATION_H
 
-//  可平凡复制
-
 template <class T,
           typename std::enable_if_t<std::is_trivially_copyable_v<T>, int> N = 0>
 
@@ -11,8 +9,6 @@ void Serialize(std::ostream &os, const T &val)
 {
   os.write((const char *)&val, sizeof(T));
 }
-
-//  容器
 
 template <class T, typename std::enable_if_t<
 
@@ -57,8 +53,6 @@ void Serialize(std::ostream &os, const T &val)
   }
 }
 
-//  可平凡复制
-
 template <class T,
           typename std::enable_if_t<std::is_trivially_copyable_v<T>, int> N = 0>
 
@@ -67,8 +61,6 @@ void Deserialize(std::istream &is, T &val)
 {
   is.read((char *)&val, sizeof(T));
 }
-
-//  容器
 
 template <class T, typename std::enable_if_t<
 
