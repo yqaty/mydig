@@ -9,10 +9,12 @@ Usage: mydig [OPTIONS]
 
 Options:
   -h,--help                   Print this help message and exit
-  -d,--domain TEXT REQUIRED   query domain name
+  -d,--domain TEXT            query domain name
   -s,--server TEXT            specify domain name server
   -t,--type TEXT              specify record type
+  -x TEXT                     shortcut for reverse lookups
   --trace                     Trace delegation down from root
+
 ```
 ## BUILD
 
@@ -76,7 +78,7 @@ basic 部分基本完成了。
 
 ### Day7
 
-写了个极简的 CMakeLists.txt 用来构建和安装项目。
+写了个极简的 CMakeLists.txt 用来构建和安装项目。加了个反向查询，大同小异。
 
 ### DNS 报文注意事项
 
