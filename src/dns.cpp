@@ -12,7 +12,7 @@
 #include "../include/serialization.hpp"
 
 std::string char2byte(char c) {
-  uint16_t fi = static_cast<uint16_t>(c >> 4);
+  uint16_t fi = static_cast<uint16_t>(static_cast<uint8_t>(c) >> 4);
   uint16_t se = static_cast<uint16_t>(c & 15);
   std::string s;
   s += fi < 10 ? static_cast<char>(fi + '0') : static_cast<char>(fi - 10 + 'a');
