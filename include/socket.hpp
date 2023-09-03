@@ -32,4 +32,6 @@ void query(std::string domain_name, std::string server, uint16_t query_type);
 void query_trace(std::string &domain_name, std::string &server,
                  uint16_t query_type);
 
+std::string ip_reverse(std::string &ip_addr);
+
 #endif

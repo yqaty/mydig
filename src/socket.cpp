@@ -154,3 +154,15 @@ void query_trace(std::string &domain_name, std::string &server,
   }
   close(sockfd);
 }
+
+std::string ip_reverse(std::string &ip_addr) {
+  std::string str[4];
+  int now = 0;
+  for (int i = 0; i < 3; ++i) {
+    int pos = ip_addr.find('.', now);
+    str[i] = ip_addr.substr(now, pos - now);
+    now = pos + 1;
+  }
+  str[3] = ip_addr.substr(now, ip_addr.size() - now);
+  return str[3] + "." + str[2] + "." + str[1] + "." + str[0] + ".in-addr.arpa";
+}

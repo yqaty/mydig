@@ -244,7 +244,7 @@ DnsRRF DnsRRF::parse(const std::string &s, int &pos) {
   ttl = ntohl(ttl);
   rdlength = ntohs(rdlength);
   std::string rdata;
-  if (type == 5 || type == 2) {
+  if (type == 5 || type == 2 || type == 12) {
     rdata = n2dns(s, pos);
   } else {
     rdata.resize(rdlength);
@@ -252,6 +252,7 @@ DnsRRF DnsRRF::parse(const std::string &s, int &pos) {
     pos += rdlength;
     Deserialize(is, rdata);
   }
+
   return DnsRRF(name, type, class_, ttl, rdlength, rdata);
 }
 
@@ -279,6 +280,13 @@ void DnsRRF::print() {
       printf("%s\t%u\tIN\tCNAME\t%s\n", name.c_str(), ttl, rdata.c_str());
       break;
 
+    case 6:
+      printf("%s\t%u\tIN\tSOA\t%s\n", name.c_str(), ttl, rdata.c_str());
+      break;
+
+    case 12:
+      printf("%s\t%u\tIN\tPTR\t%s\n", name.c_str(), ttl, rdata.c_str());
+      break;
     case 15:
       printf("%s\t%u\tIN\tMX\t%s\n", name.c_str(), ttl, rdata.c_str());
       break;
@@ -417,7 +425,29 @@ std::string DnsMessage::get_next_ip() {
 void DnsMessage::print() {
   printf(";; global options: +cmd\n");
   printf(";; Got answer\n");
-  printf(";; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: %u\n", header.id);
+  std::string status;
+  switch (header.flags.get_rcode()) {
+    case 0:
+      status = "No error";
+      break;
+    case 1:
+      status = "Format error";
+      break;
+    case 2:
+      status = "Server failue";
+      break;
+    case 3:
+      status = "Name Error";
+      break;
+    case 4:
+      status = "Not Implemented";
+    case 5:
+      status = "Refused";
+    default:
+      break;
+  }
+  printf(";; ->>HEADER<<- opcode: QUERY, status: %s, id: %u\n", status.c_str(),
+         header.id);
   printf(";; flags: ");
   if (header.flags.get_qr() == 1) {
     printf("qr ");
